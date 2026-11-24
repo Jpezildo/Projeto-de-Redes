@@ -1,0 +1,1 @@
+BPF_FILTER = "(tcp and port 80) or (udp and port 53)"

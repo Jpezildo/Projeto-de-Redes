@@ -1,0 +1,6 @@
+validate_network()
+icmp_probe()
+arp_probe()
+discover_hosts()
+syn_probe()
+scan_open_ports()
