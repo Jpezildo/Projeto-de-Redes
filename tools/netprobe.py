@@ -213,7 +213,7 @@ def executar_inventario() -> None:
                 {
                     "ip": ip_str,
                     "mac": mac_address,
-                    "status": "Online (ARP - Firewall Detectado)",
+                    "status": "Online (ARP)",
                 }
             )
         else:
