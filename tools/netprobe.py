@@ -164,8 +164,8 @@ def executar_inventario() -> None:
         timeout_ping = float(
             input("[?] Timeout de captura Ping/ARP (seg) [Padrão: 1.0]: ").strip() or "1.0"
         )
-        porta_ini = int(input("[?] Porta Inicial [Padrão: 1]: ").strip() or "1")
-        porta_fim = int(input("[?] Porta Final [Padrão: 1024]: ").strip() or "1024")
+        porta_ini = int(input("[?] Porta Inicial [Padrão: 20]: ").strip() or "20")
+        porta_fim = int(input("[?] Porta Final [Padrão: 100]: ").strip() or "100")
         mostrar_offline = (
             input("[?] Exibir também IPs offline na tabela? (s/N) [Padrão: N]: ").strip().lower()
             == "s"
