@@ -221,7 +221,7 @@ def executar_inventario() -> None:
                 {
                     "ip": ip_str,
                     "mac": "-",
-                    "status": "Offline",
+                    "status": "Sem resposta",
                 }
             )
         else:
@@ -254,7 +254,7 @@ def executar_inventario() -> None:
 
     print("\n" + "=" * 78)
     print(
-        f" INVENTÁRIO DE REDE CONCLUÍDO ({len(dispositivos_ativos)} Online / {len(dispositivos_offline)} Offline)"
+        f" INVENTÁRIO DE REDE CONCLUÍDO ({len(dispositivos_ativos)} Online / {len(dispositivos_offline)} Sem resposta)"
     )
     print("=" * 78)
     cabecalhos = ["IP", "Endereço MAC", "Status do Dispositivo", f"Portas ({porta_ini}-{porta_fim})"]
