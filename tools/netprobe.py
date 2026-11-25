@@ -224,6 +224,14 @@ def executar_inventario() -> None:
                     "status": "Offline",
                 }
             )
+        else:
+            dispositivos_offline.append(
+                {
+                    "ip": ip_str,
+                    "mac": "-",
+                    "status": "Sem resposta",
+                }
+            )
 
     print(
         f"[*] Passo 3: Varrendo portas TCP ({porta_ini} a {porta_fim}) "
