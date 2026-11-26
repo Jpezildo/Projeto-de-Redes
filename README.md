@@ -36,26 +36,33 @@ Os endereços e a interface ainda serão definidos e validados nas máquinas do 
 
 ## Organização
 
-```text
 Projeto-de-Redes/
-├── .vscode/settings.json     # configuração preexistente, preservada
+│
 ├── src/
-│   ├── __init__.py           # pacote importável
-│   └── server_http.py        # servidor HTTP da Issue #03
+│   ├── __init__.py
+│   ├── server_http.py
+│   └── sniffer.py
+│
 ├── tools/
-│   └── netprobe.py           # ferramenta auxiliar de diagnóstico e inventário
-├── docs/
-│   ├── topologia.md          # planejamento e campos a preencher na issue #02
-│   ├── preparacao-ambiente.md # configuração e validação manual do laboratório
-│   └── evidencias/
-│       └── .gitkeep          # reserva para evidências futuras
+│   └── netprobe.py
+│
+├── lab/
+│   ├── client_demo.py
+│   ├── server_dns.py
+│   └── server_http.py
+│
 ├── tests/
-│   └── test_server_http.py   # testes HTTP com unittest
-├── .gitignore               # exclusão de artefatos locais e credenciais
-├── requirements.txt         # dependências HTTP/DNS e do NetProbe
-├── README.md                # apresentação e preparação do ambiente
-└── checklist.md             # acompanhamento das 14 issues
-```
+│   ├── test_server_http.py
+│   └── test_integracao.py
+│
+├── docs/
+│   ├── topologia.md
+│   ├── preparacao-ambiente.md
+│   └── evidencias/
+│
+├── requirements.txt
+├── README.md
+└── checklist.md
 
 O código legado foi movido, sem alterações de conteúdo, para `tools/netprobe.py`. Ele é independente dos componentes HTTP/DNS de `src/`; suas dependências estão incluídas em `requirements.txt`. A configuração já rastreada em `.vscode/` permanece versionada; o `.gitignore` evita novos ajustes locais.
 
@@ -103,6 +110,81 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
+
+## Demonstração HTTP e DNS entre duas máquinas
+
+A demonstração utiliza duas máquinas conectadas à mesma
+rede local ou a uma rede virtual que permita comunicação
+entre elas.
+
+### Máquina B — Servidores
+
+Abra dois terminais na raiz do projeto.
+
+Terminal 1 — Servidor HTTP:
+
+```bash
+python lab/server_http.py
+```
+
+Terminal 2 — Servidor DNS:
+
+```bash
+python lab/server_dns.py
+```
+
+Informe o endereço IPv4 real da Máquina B quando solicitado.
+
+O servidor HTTP atende em TCP/80 e o servidor DNS
+em UDP/53.
+
+### Máquina B — Wireshark
+
+Abra o Wireshark e selecione a interface de rede
+que recebe o tráfego da Máquina A.
+
+Inicie a captura antes de executar o cliente.
+
+### Máquina A — Cliente
+
+Execute:
+
+```bash
+python lab/client_demo.py
+```
+
+Informe o endereço IPv4 da Máquina B.
+
+O cliente deverá:
+
+1. Consultar o domínio demo.lab.
+2. Receber o endereço IPv4 da Máquina B.
+3. Enviar uma requisição HTTP GET.
+4. Enviar uma requisição HTTP POST.
+5. Exibir os resultados recebidos.
+
+### Filtros de exibição do Wireshark
+
+HTTP:
+
+```text
+http && tcp.port == 80
+```
+
+DNS:
+
+```text
+dns && udp.port == 53
+```
+
+Comunicação entre as máquinas:
+
+```text
+ip.addr == IP_A && ip.addr == IP_B
+```
+
+Substitua IP_A e IP_B pelos endereços reais
+das máquinas do laboratório.
 
 ### Confirmar a instalação
 

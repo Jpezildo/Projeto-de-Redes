@@ -1,72 +1,39 @@
-# Checklist de desenvolvimento — Trabalho de Redes (Tema 4.1)
 
-> Projeto: **Laboratório de captura e análise HTTP/DNS em Python**. O objetivo é demonstrar tráfego real entre cliente A e servidor B, com IP, portas, captura ao vivo e inspeção dos dados de aplicação.
+## Validação complementar — NetProbe Wi-Fi
 
-**Status geral:** Em andamento — Issue #01 validada localmente; publicação/revisão pendentes &nbsp; | &nbsp; **Linguagem:** Python &nbsp; | &nbsp; **Ferramenta de captura:** Wireshark
+### Inventário de dispositivos
 
-## Escopo obrigatório do professor
-- [ ] Captura ao vivo na interface correta, observando comunicação entre A e B e verificando o indicador de perdas, quando disponível.
-- [ ] Filtragem HTTP em TCP/80, incluindo requisições e respostas.
-- [ ] Filtragem DNS em UDP/53, incluindo perguntas e respostas.
-- [ ] Inspeção dos cabeçalhos IPv4 e TCP/UDP: IP de origem/destino e portas de origem/destino.
-- [ ] Decodificação de aplicação: métodos GET/POST e nome de domínio consultado.
+- [ ] Executar a descoberta ICMP em uma rede autorizada.
+- [ ] Confirmar a identificação dos dispositivos que respondem ao ping.
+- [ ] Confirmar a descoberta por ARP de dispositivos que não respondem ao ICMP.
+- [ ] Conferir a associação entre IPv4 e endereço MAC.
 
-## Decisões de implementação
-- **Máquina A:** cliente Python que gera GET, POST e consulta DNS.
-- **Máquina B:** servidores Python HTTP TCP/80 e DNS UDP/53.
-- **Captura:** Wireshark na interface de rede de B (ou em ponto com visibilidade real do tráfego A ↔ B).
-- **DNS de laboratório:** `demo.lab.` → `IP_B`; sem alterar o DNS padrão do sistema.
-- **Escopo de segurança:** somente máquinas próprias/de laboratório e tráfego gerado para teste. HTTP em texto claro é proposital para fins didáticos.
-- **Portas:** 80/TCP e 53/UDP atendem ao exemplo do professor; se for necessário mudar uma delas, confirmar antes com ele.
+### Portas TCP
 
-### Estrutura esperada do repositório
-```text
-trabalho-redes/
-├── src/
-│   ├── server_http.py
-│   ├── server_dns.py
-│   └── client.py
-├── tools/
-│   └── netprobe.py            # ferramenta auxiliar legada
-├── docs/
-│   ├── topologia.md
-│   └── evidencias/
-│       └── captura-demo.pcapng
-├── tests/                     # testes adicionais, se utilizados
-├── requirements.txt
-├── .gitignore
-├── README.md
-└── checklist.md
-```
+- [ ] Identificar uma porta TCP aberta em um dispositivo de teste.
+- [ ] Interromper o serviço e verificar a alteração do resultado.
+- [ ] Reiniciar o serviço e confirmar a identificação da porta.
+- [ ] Testar uma porta fora do intervalo definido.
 
-## Painel de issues
-| Issue | Atividade | Prioridade | Dependências | Responsável | Concluída |
-|---|---|---|---|---|---|
-| #01 | Estruturar o repositório | Alta | Nenhuma | A definir | ☐ (validação local concluída) |
-| #02 | Configurar as máquinas e a rede | Crítica | #01 | A definir | ☐ (documentação pronta; laboratório pendente) |
-| #03 | Desenvolver servidor HTTP em Python | Crítica | #01, #02 | A definir | ☐ (código e testes locais prontos; laboratório pendente) |
-| #04 | Desenvolver servidor DNS UDP em Python | Crítica | #01, #02 | A definir | ☐ |
-| #05 | Desenvolver o cliente de testes Python | Crítica | #03, #04 | A definir | ☐ |
-| #06 | Preparar captura de pacotes ao vivo | Crítica | #02, #03, #04 | A definir | ☐ |
-| #07 | Validar filtragem de tráfego HTTP | Alta | #03, #05, #06 | A definir | ☐ |
-| #08 | Validar filtragem de consultas DNS | Alta | #04, #05, #06 | A definir | ☐ |
-| #09 | Inspecionar cabeçalhos IP e transporte | Alta | #07, #08 | A definir | ☐ |
-| #10 | Decodificar dados de aplicação | Alta | #07, #08 | A definir | ☐ |
-| #11 | Executar testes integrados e tratar falhas | Crítica | #03–#10 | A definir | ☐ |
-| #12 | Documentar instalação e execução | Alta | #01–#11 | A definir | ☐ |
-| #13 | Montar o roteiro da demonstração | Alta | #11, #12 | A definir | ☐ |
-| #14 | Preparar a defesa técnica e distribuir falas | Alta | #07–#13 | A definir | ☐ |
+### Validação de parâmetros
 
-> **Como usar:** atribua responsável e prazo em cada issue; marque os checkboxes conforme o trabalho for validado. O PDF é o guia de distribuição; este Markdown é o acompanhamento vivo no GitHub.
+- [ ] Testar um timeout diferente do padrão.
+- [ ] Testar uma entrada inválida.
+- [ ] Registrar a duração da varredura.
 
-## Issues detalhadas
+### Interface
 
-### ISSUE #01 — Estruturar o repositório
+- [ ] Conferir o status dos dispositivos durante a execução.
+- [ ] Conferir a apresentação dos IPs sem resposta.
+- [ ] Repetir o teste na rede real.
 
-**Área:** Organização  
-**Prioridade:** Alta · **Dificuldade:** Baixa · **Esforço estimado:** 30–45 min  
-**Dependências:** Nenhuma · **Responsável:** _a definir_ · **Prazo:** _a definir_  
+### Evidências
 
+
+- [ ] Criar uma matriz de testes.
+- [ ] Registrar data, responsável e resultado.
+- [ ] Adicionar captura de pacotes ARP reduzida.
+=======
 **Objetivo:** Deixar um ponto de partida único para o grupo, com código, documentação, dependências e evidências organizados.
 
 **Passo a passo**
@@ -529,3 +496,4 @@ ip.addr == IP_A && ip.addr == IP_B   # substituir pelos IPs reais
 |  |  |  | ☐ |
 
 **Definição de pronto:** issue só é concluída quando implementada, testada por alguém do grupo e acompanhada de evidência ou documentação no repositório.
+
