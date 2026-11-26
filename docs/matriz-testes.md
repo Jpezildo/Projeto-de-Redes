@@ -170,19 +170,51 @@ etapas em andamento e mostrou os resultados por IP apenas na tabela final.
 A tabela também omitiu os IPs sem resposta. Por isso, o teste da interface
 em tempo real falhou.
 
-O NetProbe passou a imprimir o status de cada IP na etapa ARP. A nova saída
-foi verificada com respostas simuladas. O reteste com as máquinas reais segue
-pendente. A matriz mantém o resultado observado na primeira rodada.
+### 07 — Reteste da interface no hotspot
+
+Em 25/11/2026, João Pedro Mendes repetiu o teste com a versão `e3045f9`.
+O PC A usou `10.103.91.147` e o notebook B usou `10.103.91.115`.
+Todas as rodadas usaram `10.103.91.0/24`, timeout de `0.5 s` e intervalo
+de portas `8000–8000`.
+
+| Cenário | Resultado no Passo 2 para `10.103.91.115` | Status |
+| --- | --- | --- |
+| B conectado | `Online (ARP - Firewall Detectado)` com MAC `f6-55-b8-e3-50-3d` | Passou |
+| B desconectado, com entrada dinâmica ainda no cache ARP de A | Mesmo status online e mesmo MAC | Falhou |
+| B desconectado, após remover a entrada de B do cache ARP de A | `Offline (sem resposta)` | Passou com o cache limpo |
+
+O NetProbe pode usar um MAC antigo do cache como sinal de que o dispositivo
+está online. Nesta rodada, a consulta `arp -a 10.103.91.115 -N 10.103.91.147`
+mostrou a entrada dinâmica. No PowerShell como administrador de A, usamos
+`arp -d 10.103.91.115 10.103.91.147` e repetimos a consulta para confirmar
+que a entrada tinha sumido antes de rodar o NetProbe novamente.
+
+Evidência desta rodada registrada pelo operador durante o teste. O print
+do terminal ainda precisa ser anexado.
+
+### 07 — Reteste após a correção no Wi-Fi normal
+
+Em 25/11/2026, João Pedro Mendes repetiu o teste com a versão local que
+seleciona a interface ARP pela rota do destino e usa o cache apenas para
+preencher o MAC de um IP que respondeu ao ICMP. O PC A usou `192.168.1.10`
+e o notebook B usou `192.168.1.4`. A rede foi `192.168.1.0/24`, com
+timeout de `0.5 s` e portas `8000–8000`.
+
+| Cenário | Resultado no Passo 2 | Status |
+| --- | --- | --- |
+| B conectado | `Online (ARP)` com o MAC esperado do notebook | Passou |
+| Wi-Fi de B desligado, com o MAC ainda no cache ARP de A | `Offline (sem resposta)` | Passou |
+
+Resultados informados pelo operador. A entrada ARP foi consultada antes
+da segunda rodada e permaneceu no cache sem limpeza manual.
 
 ## Pendências para fechar a Issue #11
 
-- Ajustar o terminal para exibir o status de cada IP conforme o resultado é
-  apurado. Repetir a varredura com B ligada e um IP sabidamente livre. Conferir
-  se o notebook aparece como online e o IP livre como «sem resposta» durante
-  a execução. Registrar o novo resultado. Cronometrar a varredura completa
-  da `/24` e verificar se o programa explica uma entrada inválida.
-- Atualizar a Issue #11 e o README. O roteiro atual descreve GET, POST e DNS.
-  Para o NetProbe, documentar a preparação das máquinas, o Npcap, o comando de
-  execução e como demonstrar ICMP, ARP, IP/MAC, status em tempo real e portas.
-  Pedir a outro integrante que repita o roteiro em outra máquina ou VM e
-  registrar as dificuldades e suas soluções.
+- Anexar a evidência do terminal do reteste no Wi-Fi normal. O hotspot
+  fica registrado como diagnóstico, sem nova rodada prevista.
+- Cronometrar a varredura completa da `/24` e verificar a mensagem para uma
+  entrada inválida.
+- Em 26/11/2026, executar a bateria completa com os notebooks que serão
+  usados na apresentação e confirmar os cinco critérios na versão escolhida.
+  Pedir a outro integrante que siga o roteiro do README e registrar os
+  resultados, as dificuldades e suas soluções.

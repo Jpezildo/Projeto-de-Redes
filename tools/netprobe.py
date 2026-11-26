@@ -3,7 +3,7 @@ import ipaddress
 import socket
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from scapy.all import IP, ICMP, TCP, Ether, ARP, sr1, srp
+from scapy.all import IP, ICMP, TCP, Ether, ARP, conf, sr1, srp
 from tabulate import tabulate
 import re
 import subprocess
@@ -22,14 +22,18 @@ def varredura_icmp(ip, timeout):
 
 def sonda_arp(ip, timeout):
     try:
+        interface, _, _ = conf.route.route(ip)
         pacote = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip)
-        respostas, _ = srp(pacote, timeout=timeout, verbose=0)
+        respostas, _ = srp(pacote, iface=interface, timeout=timeout, verbose=0)
         for _, pacote_recebido in respostas:
             if pacote_recebido.hwsrc:
                 return pacote_recebido.hwsrc
     except Exception:
         pass
+    return None
 
+
+def consultar_cache_arp(ip):
     try:
         if sys.platform.startswith("win"):
             comando = f"C:\\Windows\\System32\\arp.exe -a {ip}"
@@ -76,6 +80,10 @@ def main():
         print("\n[!] Erro: Você digitou um valor inválido. Execução abortada com segurança.")
         sys.exit(1)
 
+    if porta_ini > porta_fim:
+        print("\n[!] Erro: A porta inicial deve ser menor ou igual à porta final.")
+        sys.exit(1)
+
     print(f"\n[*] Iniciando captura na rede {rede}...")
     
     dispositivos_ativos = [] 
@@ -95,9 +103,10 @@ def main():
         mac_address = sonda_arp(ip_str, timeout_ping)
         
         if ip_str in ips_respondidos_icmp:
+            mac_address = mac_address or consultar_cache_arp(ip_str)
             dispositivos_ativos.append({"ip": ip_str, "mac": mac_address or "Desconhecido", "status": "Online (ICMP)"})
         elif mac_address:
-            dispositivos_ativos.append({"ip": ip_str, "mac": mac_address, "status": "Online (ARP - Firewall Detectado)"})
+            dispositivos_ativos.append({"ip": ip_str, "mac": mac_address, "status": "Online (ARP)"})
         else:
             print(f"{ip_str} | Offline (sem resposta)", flush=True)
             continue
