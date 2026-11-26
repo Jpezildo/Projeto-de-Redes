@@ -47,3 +47,4 @@ reports/
 *.pcap
 *.pcapng
 # Exemplo futuro: !docs/evidencias/captura-demo.pcapng
+!docs/evidencias/teste-arp-wifi-evidencia.pcapng

@@ -220,6 +220,16 @@ O programa solicita rede, timeout e intervalo de portas. Use-o somente em ambien
 
 O envio de pacotes brutos pode exigir permissões elevadas, conforme o sistema. No Windows, determinados recursos do Scapy dependem do **Npcap**, um driver externo que não é instalado pelo `pip`. Sua disponibilidade e suas permissões precisam ser verificadas separadamente; nenhum driver foi instalado nesta revisão. A importação das bibliotecas não comprova a operação de rede.
 
+### Roteiro de testes do NetProbe Wi-Fi — Issue #11
+
+1. Conecte as máquinas A (NetProbe) e B (alvo de teste) à mesma rede local IPv4 `/24`. Confira os IPs e o MAC do Wi-Fi de B com `ipconfig /all`. No Windows, confirme que o Npcap está ativo em A e selecione o Wi-Fi no Wireshark.
+2. Rode o NetProbe em A, informe a rede `/24` e use o timeout padrão de `0.5 s`. Com B respondendo ao ping, confira `Online (ICMP)`. Repita com B ligada e sem responder ao ping. Confira a requisição e a resposta ARP no Wireshark e compare o MAC da tabela com o de B.
+3. Durante a etapa ARP, acompanhe o status de cada IP no terminal. Confira um dispositivo online e um IP conhecido sem equipamento, que deve aparecer como `Offline (sem resposta)`. Esse rótulo indica ausência de resposta na rodada.
+4. Use em B um serviço HTTP na porta TCP `8000`. Em A, confira o intervalo `7999–8001` com o serviço ligado, parado e reiniciado. Com o serviço ligado, repita com `8001–8001` para verificar que a porta `8000` fica fora do resultado.
+5. Repita com um timeout diferente, registre a duração da varredura e confira o comportamento com uma entrada inválida. Outro integrante deve repetir o roteiro em outra máquina ou VM e registrar o resultado.
+
+A [matriz da Issue #11](docs/matriz-testes.md) contém os comandos e resultados por cenário. A [captura ARP](docs/evidencias/teste-arp-wifi-evidencia.pcapng) contém os três pacotes usados como evidência.
+
 ### Limitações e observações do código legado
 
 O NetProbe não implementa captura passiva contínua nem inspeção de payloads HTTP/DNS. **Não substitui o Wireshark nem implementa os cinco requisitos do tema 4.1.** O título do terminal menciona captura ao vivo, mas a operação implementada é sondagem ativa com coleta de respostas.

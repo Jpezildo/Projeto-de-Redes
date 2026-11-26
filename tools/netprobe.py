@@ -14,6 +14,9 @@ if RAIZ_PROJETO not in sys.path:
     sys.path.insert(0, RAIZ_PROJETO)
 
 from scapy.all import IP, ICMP, TCP, Ether, ARP, sr, srp, send, conf, get_if_hwaddr
+=======
+from scapy.all import IP, ICMP, TCP, Ether, ARP, conf, sr1, srp
+
 from tabulate import tabulate
 
 from src.sniffer import iniciar_sniffer, listar_interfaces
@@ -43,6 +46,7 @@ def obter_ip_e_mac_locais() -> tuple[str | None, str | None]:
         pass
 
     try:
+
         mac = get_if_hwaddr(conf.iface)
         if mac and mac != "00:00:00:00:00:00":
             mac_local = mac.lower()
@@ -72,16 +76,28 @@ def varredura_arp_lote(rede_str: str, timeout: float) -> dict[str, str]:
     try:
         pacote = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=rede_str)
         respostas, _ = srp(pacote, timeout=timeout, verbose=0)
+=======
+        interface, _, _ = conf.route.route(ip)
+        pacote = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip)
+        respostas, _ = srp(pacote, iface=interface, timeout=timeout, verbose=0)
+
         for _, pacote_recebido in respostas:
             if pacote_recebido.psrc and pacote_recebido.hwsrc:
                 mapa_ip_mac[pacote_recebido.psrc] = pacote_recebido.hwsrc.lower()
     except Exception:
         pass
+
     return mapa_ip_mac
 
 
 def consultar_cache_arp_so(ip: str) -> str | None:
     """Fallback que consulta a tabela ARP local do sistema operacional."""
+=======
+    return None
+
+
+def consultar_cache_arp(ip):
+
     try:
         if sys.platform.startswith("win"):
             comando = ["C:\\Windows\\System32\\arp.exe", "-a", ip]
@@ -171,6 +187,7 @@ def executar_inventario() -> None:
             == "s"
         )
 
+
         if porta_ini < 1 or porta_fim > 65535 or porta_ini > porta_fim:
             raise ValueError("Faixa de portas inválida.")
     except ValueError as err:
@@ -225,6 +242,41 @@ def executar_inventario() -> None:
                     "status": "Sem resposta",
                 }
             )
+=======
+    if porta_ini > porta_fim:
+        print("\n[!] Erro: A porta inicial deve ser menor ou igual à porta final.")
+        sys.exit(1)
+
+    print(f"\n[*] Iniciando captura na rede {rede}...")
+    
+    dispositivos_ativos = [] 
+    ips_respondidos_icmp = set()
+
+    print("[*] Passo 1: Disparando pacotes ICMP e capturando respostas...")
+    with ThreadPoolExecutor(max_workers=50) as executor:
+        tarefas = [executor.submit(varredura_icmp, str(ip), timeout_ping) for ip in rede.hosts()]
+        for tarefa in tarefas:
+            resultado = tarefa.result()
+            if resultado:
+                ips_respondidos_icmp.add(resultado)
+
+    print("[*] Passo 2: Disparando pacotes ARP para contorno de firewall e vinculação MAC...")
+    for ip in rede.hosts():
+        ip_str = str(ip)
+        mac_address = sonda_arp(ip_str, timeout_ping)
+        
+        if ip_str in ips_respondidos_icmp:
+            mac_address = mac_address or consultar_cache_arp(ip_str)
+            dispositivos_ativos.append({"ip": ip_str, "mac": mac_address or "Desconhecido", "status": "Online (ICMP)"})
+        elif mac_address:
+            dispositivos_ativos.append({"ip": ip_str, "mac": mac_address, "status": "Online (ARP)"})
+        else:
+            print(f"{ip_str} | Offline (sem resposta)", flush=True)
+            continue
+
+        dispositivo = dispositivos_ativos[-1]
+        print(f"{ip_str} | {dispositivo['status']} | MAC: {dispositivo['mac']}", flush=True)
+
 
     print(
         f"[*] Passo 3: Varrendo portas TCP ({porta_ini} a {porta_fim}) "
